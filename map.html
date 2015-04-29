@@ -8,8 +8,15 @@
       html, body, #map-canvas {
         margin: 0px;
         padding: 0px;
-
+      
       }
+      #map-canvas {
+      margin-top:20px;
+      height:500px;
+      width:1000px;
+      float:left
+      }
+
       #div_volunteers div {
       padding: 2px;
       margin: 2px;
@@ -20,7 +27,8 @@
       overflow: scroll;
       height:400px;
       width:400px;
-      float:left
+      float:left;
+      margin-top: 20px;
       }
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
@@ -115,8 +123,10 @@
     
   </head>
   <body >
-    <div  id="div_volunteers">Volunteers</div>
-  <div style="height:500px;width:1000px;float:right" id="map-canvas"></div>
+    <div>
+      <div  id="div_volunteers">Volunteers</div>
+      <div  id="map-canvas"></div>
+    </div>
 
   </body>
 </html>
