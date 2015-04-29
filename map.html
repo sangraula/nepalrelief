@@ -3,16 +3,31 @@
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <title>Circles</title>
+    <title>Nepal Relief</title>
     <style>
       html, body, #map-canvas {
-        height: 100%;
         margin: 0px;
-        padding: 0px
+        padding: 0px;
 
+      }
+      #div_volunteers div {
+      padding: 2px;
+      margin: 2px;
+      font-size:12px;
+      background-color:#eeeeee;
+      }
+      #div_volunteers {
+      overflow: scroll;
+      height:400px;
+      width:400px;
+      float:left
       }
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
+    <!-- add parse js -->
+    <script src="https://www.parsecdn.com/js/parse-latest.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.3.js"></script>
+
     <script>
       // This example creates circles on the map, representing
       // populations in North America.
@@ -70,8 +85,38 @@
       google.maps.event.addDomListener(window, 'load', initialize);
 
     </script>
+
+    <script>
+      $(document).ready(function() {
+      Parse.initialize("0UHsh8uG4qsFbCsOqEzrbh0zxkTMld3Z4LKa9hge", "VRZRFXlJ5wmWd7XuZmkkwQawxkHJ91Tw6gxChtaT");
+      VolunteerObj = Parse.Object.extend("Volunteer");
+      var querytodb = new Parse.Query(VolunteerObj);
+      console.log("Parse data from Parse.com");
+     	querytodb.find({
+      success: function(results) {
+      console.log("iterating over volunteers");
+      
+      results.forEach(function(result) {
+      $("#div_volunteers").append("<div>"
+       +"<div>Name: "+result.attributes.name+" from "+result.attributes.place+ ",</div>"
+        +"<div>Lat :"+result.attributes.lat +", long:"+result.attributes.long+" </div>"
+      +"</div>");
+      console.log(result.attributes);
+      })
+      console.log("Success");
+    
+      },
+      error: function(error) {
+      alert("Error: " + error.code + " " + error.message);
+			  }
+      });
+      });
+    </script>
+    
   </head>
-  <body>
-    <div id="map-canvas"></div>
+  <body >
+    <div  id="div_volunteers">Volunteers</div>
+  <div style="height:500px;width:1000px;float:right" id="map-canvas"></div>
+
   </body>
 </html>
