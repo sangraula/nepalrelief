@@ -97,17 +97,21 @@
         </script>
         <script>
             $(document).ready(function() {
+
                 Parse.initialize("0UHsh8uG4qsFbCsOqEzrbh0zxkTMld3Z4LKa9hge", "VRZRFXlJ5wmWd7XuZmkkwQawxkHJ91Tw6gxChtaT");
+
                 VolunteerObj = Parse.Object.extend("Volunteer");
                 var querytodb = new Parse.Query(VolunteerObj);
+
                 console.log("Parse data from Parse.com");
                 querytodb.find({
                     success: function(results) {
                         console.log("iterating over volunteers");
 
                         results.forEach(function(result) {
-                            $("#div_volunteers").append("<div>" + "<div>Name: " + result.attributes.name + " from " + result.attributes.place + ",</div>" + "<div>Lat :" + result.attributes.lat + ", long:" + result.attributes.long + " </div>" + "</div>");
-                            console.log(result.attributes);
+                            var divTitle = result.attributes.name + "-" + result.attributes.updatedat + ":" + result.attributes.phone + "," + result.attributes.needType + "," + result.attributes.item;
+                            $("#div_volunteers").append("<div title='" + divTitle + "' ><div>Name: " + result.attributes.name + " from " + result.attributes.place + ",</div>" + "<div>Lat :" + result.attributes.lat + ", long:" + result.attributes.long + " </div>" + "</div>");
+                            console.dir(result.attributes);
                         })
                         console.log("Success");
 
@@ -116,6 +120,7 @@
                         alert("Error: " + error.code + " " + error.message);
                     }
                 });
+                Parse.User.logOut();
             });
         </script>
     </head>
