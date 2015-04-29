@@ -12,7 +12,7 @@
             }
             #map-canvas {
                 margin-top:20px;
-                height:500px;
+                height:800px;
                 width:1000px;
                 float:left
             }
@@ -28,6 +28,11 @@
                 width:400px;
                 float:left;
                 margin-top: 20px;
+            }
+            #div_heading {
+                height: 800px;
+                width: 400px;
+                float:left;
             }
         </style>
         <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
@@ -114,13 +119,16 @@
             });
         </script>
     </head>
-    <body >
-      <div id="div_heading">
-        <a href="http://helpnepal.geohives.com/volunteer/">Register as a Volunteer</a>
-      </div>
-      <div id="div_container">
-        <div  id="div_volunteers">Volunteers</div>
-        <div  id="map-canvas"></div>
-      </div>
+    
+    <body>
+        <div id="div_container">
+            <div id="div_heading">
+                <div>Register as a Volunteer</div>
+                <iframe style="height:250px" width="100%" src="http://helpnepal.geohives.com/volunteer/"></iframe>
+                <div id="div_volunteers">Volunteers</div>
+            </div>
+            <div id="map-canvas"></div>
+        </div>
     </body>
+
 </html>
