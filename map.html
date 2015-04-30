@@ -22,7 +22,13 @@
                 font-size:12px;
                 background-color:#eeeeee;
             }
-            #div_volunteers {
+            #div_bad_volunteers div {
+                padding: 2px;
+                margin: 2px;
+                font-size:12px;
+                background-color:#bbbbbb;
+            }
+            #div_volunteers, #div_bad_volunteers {
                 overflow: scroll;
                 height:400px;
                 width:400px;
@@ -94,33 +100,44 @@
             }
 
             google.maps.event.addDomListener(window, 'load', initialize);
-        </script>
-        <script>
-            $(document).ready(function() {
 
+            $(document).ready(function() {
                 Parse.initialize("0UHsh8uG4qsFbCsOqEzrbh0zxkTMld3Z4LKa9hge", "VRZRFXlJ5wmWd7XuZmkkwQawxkHJ91Tw6gxChtaT");
 
-                VolunteerObj = Parse.Object.extend("Volunteer");
-                var querytodb = new Parse.Query(VolunteerObj);
-
-                console.log("Parse data from Parse.com");
-                querytodb.find({
-                    success: function(results) {
-                        console.log("iterating over volunteers");
-
-                        results.forEach(function(result) {
-                            var divTitle = result.attributes.name + "-" + result.attributes.updatedat + ":" + result.attributes.phone + "," + result.attributes.needType + "," + result.attributes.item;
-                            $("#div_volunteers").append("<div title='" + divTitle + "' ><div>Name: " + result.attributes.name + " from " + result.attributes.place + ",</div>" + "<div>Lat :" + result.attributes.lat + ", long:" + result.attributes.long + " </div>" + "</div>");
-                            console.dir(result.attributes);
-                        })
-                        console.log("Success");
-
-                    },
-                    error: function(error) {
-                        alert("Error: " + error.code + " " + error.message);
+                var volunteerObj = Parse.Object.extend("Volunteer", {
+                    checkIfUsableInMap: function() {
+                        if ((this.get("lat") == undefined) && (this.get("long") == undefined)) {
+                            return false;
+                        } else {
+                            return true;
+                        };
                     }
                 });
-                Parse.User.logOut();
+                var volunteerList = Parse.Collection.extend({
+                    model: volunteerObj
+                });
+                var volunteerLists = new volunteerList;
+
+                volunteerLists.fetch({
+                    success: function(collection) {
+                        collection.each(function(volunteer) {
+                            console.warn(volunteer.checkIfUsableInMap());
+                            if (volunteer.checkIfUsableInMap() === false) {
+                                var divTitle = volunteer.attributes.name + "-" + volunteer.updatedate + ":" + volunteer.attributes.phone + "," + volunteer.attributes.needType + "," + volunteer.attributes.item;
+                                $("#div_bad_volunteers").append("<div title='" + divTitle + "' ><div>Name: " + volunteer.attributes.name + " from " + volunteer.attributes.place + ",</div>" + "<div>Lat :" + volunteer.attributes.lat + ", long:" + volunteer.attributes.long + " </div>" + "</div>");
+
+                            } else {
+                                $("#div_volunteers").append("<div title='" + divTitle + "' ><div>Name: " + volunteer.attributes.name + " from " + volunteer.attributes.place + ",</div>" + "<div>Lat :" + volunteer.attributes.lat + ", long:" + volunteer.attributes.long + " </div>" + "</div>");
+
+                            };
+                        });
+                    },
+                    error: function(collection, error) {
+                        // The collection could not be retrieved.
+                    }
+                });
+
+
             });
         </script>
     </head>
@@ -130,7 +147,8 @@
             <div id="div_heading">
                 <div>Register as a Volunteer</div>
                 <iframe style="height:250px" width="100%" src="http://helpnepal.geohives.com/volunteer/"></iframe>
-                <div id="div_volunteers">Volunteers</div>
+                <div id="div_volunteers">Volunteers:</div>
+                <div id="div_bad_volunteers">Volunteers without location:</div>
             </div>
             <div id="map-canvas"></div>
         </div>
