@@ -67,15 +67,15 @@
                     map: map,
                     title: volunteer.tooltip()
                 });
+                marker.setIcon(volunteer.markerIcon())
                 var infowindow = new google.maps.InfoWindow({
                     content: volunteer.details()
                 });
 
 
-
-
                 volunteerCircle = new google.maps.Circle(volunteerOptions);
                 volunteerCircle.bindTo('center', marker, 'position');
+
                 google.maps.event.addListener(marker, 'click', function() {
                     if (volunteerMapInfoWindow) {
                         volunteerMapInfoWindow.close();
@@ -109,12 +109,15 @@
                         };
                     },
                     details: function() {
-                        return "<div><strong> Name: " + this.get("name") + "</br></strong>" + " is available at " + "<strong>" + this.get("place") + "</strong>" + ", can be contacted at " + "<strong>" + this.get("phone") + "</strong>" + "</div>"
+                        return "<div id='div_volunteer_list_entry' style='background-color:" + this.backgroundColor + ";width:10px;height:25px;float:left'></div><div><strong> Name: " + this.get("name") + "</br></strong>" + " is available  <strong> FOR HELP at </strong><strong>" + this.get("place") + "</strong>" + ", please contact " + "<strong>" + this.get("phone") + "</strong>" + "</div>"
                     },
                     tooltip: function() {
                         this.get("name") + " is available at " + this.get("place") + ", can be contacted at " + this.get("phone")
-                    }
-
+                    },
+                    markerIcon: function() {
+                        return 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
+                    },
+                    backgroundColor: '#00FF7F'
                 });
                 var volunteerList = Parse.Collection.extend({
                     model: volunteerObj,
@@ -131,14 +134,62 @@
                 volunteerLists.fetch({
                     success: function(collection) {
                         collection.each(function(volunteer) {
-                            var divTitle = volunteer.attributes.name + "-" + volunteer.get("updatedat") + ":" + volunteer.attributes.phone + "," + volunteer.attributes.needType + "," + volunteer.attributes.item;
                             if (volunteer.checkIfUsableInMap() === false) {
-
-                                $("#div_bad_volunteers").append("<div title='" + divTitle + "' ><div>Name: " + volunteer.attributes.name + " from " + volunteer.attributes.place + ",</div>" + "<div>Lat :" + volunteer.attributes.lat + ", long:" + volunteer.attributes.long + " </div>" + "</div>");
-
+                                $("#div_bad_volunteers").append(volunteer.details());
                             } else {
                                 addVolunteerToMap(map, volunteer);
-                                $("#div_volunteers").append("<div title='" + divTitle + "' ><div>Name: " + volunteer.attributes.name + " from " + volunteer.attributes.place + ",</div>" + "<div>Lat :" + volunteer.attributes.lat + ", long:" + volunteer.attributes.long + " </div>" + "</div>");
+                                $("#div_volunteers").append(volunteer.details());
+                            };
+                        });
+                    },
+                    error: function(collection, error) {
+                        // The collection could not be retrieved.
+                    }
+                });
+
+
+                //volunteer Needed mapping 
+
+                var volunteerNeededObj = Parse.Object.extend("NeedVolunteer", {
+                    checkIfUsableInMap: function() {
+                        if ((this.get("lat") == undefined) && (this.get("long") == undefined)) {
+                            return false;
+                        } else {
+                            return true;
+                        };
+                    },
+                    details: function() {
+                        return "<div id='div_volunteer_list_entry' style='background-color:" + this.backgroundColor + ";width:10px;height:25px;float:left'></div><div><strong> Name: " + this.get("name") + "</br></strong>" + "  <strong> NEED HELP at </strong><strong>" + this.get("place") + "</strong>" + ", please contact " + "<strong>" + this.get("phone") + "</strong>" + "</div>"
+                    },
+                    tooltip: function() {
+                        this.get("name") + " is available at " + this.get("place") + ", can be contacted at " + this.get("phone")
+                    },
+                    markerIcon: function() {
+                        return 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
+                    },
+                    backgroundColor: '#FFDAB9'
+
+                });
+                var volunteerNeededList = Parse.Collection.extend({
+                    model: volunteerNeededObj,
+                    query: (new Parse.Query(volunteerNeededObj)),
+
+                    comparator: function(volunteerNeededObj) {
+                        return volunteerNeededObj.get('updatedAt');
+                    }
+                });
+
+                var volunteerNeededLists = new volunteerNeededList;
+
+                volunteerNeededLists.query.descending("updatedAt");
+                volunteerNeededLists.fetch({
+                    success: function(collection) {
+                        collection.each(function(volunteer) {
+                            if (volunteer.checkIfUsableInMap() === false) {
+                                $("#div_bad_volunteers").append(volunteer.details());
+                            } else {
+                                addVolunteerToMap(map, volunteer);
+                                $("#div_volunteers").append(volunteer.details());
 
                             };
                         });
@@ -147,6 +198,7 @@
                         // The collection could not be retrieved.
                     }
                 });
+
             };
 
 
