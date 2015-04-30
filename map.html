@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-
+    
     <head>
         <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
         <meta charset="utf-8">
@@ -47,8 +47,10 @@
         <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.3.js"></script>
         <script>
             var volunteerCircle;
+            var volunteerMapInfoWindow;
 
             function addVolunteerToMap(map, volunteer) {
+                var centerLatlng = new google.maps.LatLng(volunteer.get("lat"), volunteer.get("long"));
                 var volunteerOptions = {
                     strokeColor: '#FF0000',
                     strokeOpacity: 0.8,
@@ -56,11 +58,33 @@
                     fillColor: '#00FF00',
                     fillOpacity: 0.35,
                     map: map,
-                    center: new google.maps.LatLng(volunteer.get("lat"), volunteer.get("long")),
+                    center: centerLatlng,
                     radius: Math.sqrt(100) * 100
                 };
+                // Marker Icons Implementation
+                var marker = new google.maps.Marker({
+                    position: centerLatlng,
+                    map: map,
+                    title: volunteer.tooltip()
+                });
+                var infowindow = new google.maps.InfoWindow({
+                    content: volunteer.details()
+                });
+
+
+
 
                 volunteerCircle = new google.maps.Circle(volunteerOptions);
+                volunteerCircle.bindTo('center', marker, 'position');
+                google.maps.event.addListener(marker, 'click', function() {
+                    if (volunteerMapInfoWindow) {
+                        volunteerMapInfoWindow.close();
+                    }
+                    infowindow.open(map, marker);
+                    volunteerMapInfoWindow = infowindow;
+
+                });
+
             };
 
             function initialize() {
@@ -84,6 +108,12 @@
                             return true;
                         };
                     },
+                    details: function() {
+                        return "<div><strong> Name: " + this.get("name") + "</br></strong>" + " is available at " + "<strong>" + this.get("place") + "</strong>" + ", can be contacted at " + "<strong>" + this.get("phone") + "</strong>" + "</div>"
+                    },
+                    tooltip: function() {
+                        this.get("name") + " is available at " + this.get("place") + ", can be contacted at " + this.get("phone")
+                    }
 
                 });
                 var volunteerList = Parse.Collection.extend({
@@ -123,7 +153,7 @@
             google.maps.event.addDomListener(window, 'load', initialize);
         </script>
     </head>
-
+    
     <body>
         <div id="div_container">
             <div id="div_heading">
