@@ -111,19 +111,27 @@
                         } else {
                             return true;
                         };
-                    }
+                    },
+
                 });
                 var volunteerList = Parse.Collection.extend({
-                    model: volunteerObj
+                    model: volunteerObj,
+                    query: (new Parse.Query(volunteerObj)),
+
+                    comparator: function(volunteerObj) {
+                        return volunteerObj.get('updatedAt');
+                    }
                 });
+
                 var volunteerLists = new volunteerList;
 
+                volunteerLists.query.descending("updatedAt");
                 volunteerLists.fetch({
                     success: function(collection) {
                         collection.each(function(volunteer) {
-                            console.warn(volunteer.checkIfUsableInMap());
+                            var divTitle = volunteer.attributes.name + "-" + volunteer.get("updatedat") + ":" + volunteer.attributes.phone + "," + volunteer.attributes.needType + "," + volunteer.attributes.item;
                             if (volunteer.checkIfUsableInMap() === false) {
-                                var divTitle = volunteer.attributes.name + "-" + volunteer.updatedate + ":" + volunteer.attributes.phone + "," + volunteer.attributes.needType + "," + volunteer.attributes.item;
+
                                 $("#div_bad_volunteers").append("<div title='" + divTitle + "' ><div>Name: " + volunteer.attributes.name + " from " + volunteer.attributes.place + ",</div>" + "<div>Lat :" + volunteer.attributes.lat + ", long:" + volunteer.attributes.long + " </div>" + "</div>");
 
                             } else {
